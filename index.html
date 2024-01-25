@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Conversation Maker! :D</title>
+    <meta charset="utf-8" />
+  </head>
+  <body>
+    <button id="authorize_button" onclick="handleAuthClick()">Authorize</button>
+    <button id="signout_button" onclick="handleSignoutClick()">Sign Out</button>
+    <p>Conversation Maker! :D</p>
+
+    <div id="randomize_button"></div>
+    <!--Add buttons to initiate auth sequence and sign out-->
+
+    <li id="content" style="white-space: pre-wrap;"></li>
+
+    <script type="text/javascript">
+      /* exported gapiLoaded */
+      /* exported gisLoaded */
+      /* exported handleAuthClick */
+      /* exported handleSignoutClick */
+
+      // TODO(developer): Set to client ID and API key from the Developer Console
+      const CLIENT_ID = '1023570864367-bkkvd33btkgbb1ard0tgv7kr2bbf3aq8.apps.googleusercontent.com';
+      const API_KEY = 'AIzaSyCfV9arysBl7Dsb4lDTO73Y_uXRyxpQlP8';
+
+      // Discovery doc URL for APIs used by the quickstart
+      const DISCOVERY_DOC = 'https://sheets.googleapis.com/$discovery/rest?version=v4';
+
+      // Authorization scopes required by the API; multiple scopes can be
+      // included, separated by spaces.
+      const SCOPES = 'https://www.googleapis.com/auth/spreadsheets.readonly';
+
+      let tokenClient;
+      let gapiInited = false;
+      let gisInited = false;
+
+      document.getElementById('authorize_button').style.visibility = 'hidden';
+      document.getElementById('signout_button').style.visibility = 'hidden';
+
+      /**
+       * Callback after api.js is loaded.
+       */
+      function gapiLoaded() {
+        gapi.load('client', initializeGapiClient);
+      }
+
+      /**
+       * Callback after the API client is loaded. Loads the
+       * discovery doc to initialize the API.
+       */
+      async function initializeGapiClient() {
+        await gapi.client.init({
+          apiKey: API_KEY,
+          discoveryDocs: [DISCOVERY_DOC],
+        });
+        gapiInited = true;
+        maybeEnableButtons();
+      }
+
+      /**
+       * Callback after Google Identity Services are loaded.
+       */
+      function gisLoaded() {
+        tokenClient = google.accounts.oauth2.initTokenClient({
+          client_id: CLIENT_ID,
+          scope: SCOPES,
+          callback: '', // defined later
+        });
+        gisInited = true;
+        maybeEnableButtons();
+      }
+
+      /**
+       * Enables user interaction after all libraries are loaded.
+       */
+      function maybeEnableButtons() {
+        if (gapiInited && gisInited) {
+          document.getElementById('authorize_button').style.visibility = 'visible';
+        }
+      }
+
+      /**
+       *  Sign in the user upon button click.
+       */
+      function handleAuthClick() {
+        tokenClient.callback = async (resp) => {
+          if (resp.error !== undefined) {
+            throw (resp);
+          }
+          document.getElementById('signout_button').style.visibility = 'visible';
+          document.getElementById('authorize_button').innerText = 'Refresh';
+          await listMajors();
+        };
+
+        if (gapi.client.getToken() === null) {
+          // Prompt the user to select a Google Account and ask for consent to share their data
+          // when establishing a new session.
+          tokenClient.requestAccessToken({prompt: 'consent'});
+        } else {
+          // Skip display of account chooser and consent dialog for an existing session.
+          tokenClient.requestAccessToken({prompt: ''});
+        }
+      }
+
+      /**
+       *  Sign out the user upon button click.
+       */
+      function handleSignoutClick() {
+        const token = gapi.client.getToken();
+        if (token !== null) {
+          google.accounts.oauth2.revoke(token.access_token);
+          gapi.client.setToken('');
+          document.getElementById('content').innerText = '';
+          document.getElementById('authorize_button').innerText = 'Authorize';
+          document.getElementById('signout_button').style.visibility = 'hidden';
+        }
+      }
+
+    function getRandomInt(max) {
+        return Math.floor(Math.random() * max);
+    }
+
+    function personNameReplace(str, person1, person2, range) {
+        
+        str = str.replace(/PERSON 1 AND 2/gi, person1+" and "+person2);
+
+        if (str.toUpperCase().indexOf("PICK ANOTHER PERSON 1") !== -1) {
+            newPerson1 = range.values[getRandomInt(range.values.length)][0];
+            str = str.replace(/\[PICK ANOTHER PERSON 1\]/gi, newPerson1);
+            str = str.replace(/PICK ANOTHER PERSON 1/gi, newPerson1);
+        }
+
+        if (str.toUpperCase().indexOf("PICK ANOTHER PERSON 2") !== -1) {
+            newPerson2 = range.values[getRandomInt(range.values.length)][0];
+            str = str.replace(/\[PICK ANOTHER PERSON 2\]/gi, newPerson2);
+            str = str.replace(/PICK ANOTHER PERSON 2/gi, newPerson2);
+        }
+
+        if (person1.toUpperCase().indexOf("PERSON 1") === -1) {
+            str = str.replace(/\[person 1\]/gi, person1);
+            str = str.replace(/person 1/gi, person1);
+        }
+
+        if (person2.toUpperCase().indexOf("PERSON 2") === -1) {
+            str = str.replace(/\[person 2\]/gi, person2);
+            str = str.replace(/person 2/gi, person2);
+        }
+
+        return str
+    }
+
+      /**
+       * conversation maker spreadsheet:
+       * https://docs.google.com/spreadsheets/d/1qHGfHQVFGn44adJBvdH02ADpiXIvdFJqNHQsWknqGeo/edit
+       */
+      async function listMajors() {
+        let response;
+        try {
+          response = await gapi.client.sheets.spreadsheets.values.get({
+            spreadsheetId: '1qHGfHQVFGn44adJBvdH02ADpiXIvdFJqNHQsWknqGeo',
+            range: 'Convos!A2:E',
+          });
+        } catch (err) {
+          document.getElementById('content').innerText = err.message;
+          return;
+        }
+        const range = response.result;
+        if (!range || !range.values || range.values.length == 0) {
+          document.getElementById('content').innerText = 'No values found.';
+          return;
+        }
+
+        var button = document.createElement('button');
+        button.innerHTML = 'randomize';
+        button.onclick = function(){
+            console.log(range.values);
+            row = getRandomInt(range.values.length);
+            person1 = range.values[getRandomInt(range.values.length)][0];
+            person2 = range.values[getRandomInt(range.values.length)][1];
+
+            person1 = personNameReplace(person1, person1, person2, range);
+            person2 = personNameReplace(person2, person1, person2, range);
+
+            person1Says = range.values[getRandomInt(range.values.length)][2];
+            person2Says = range.values[getRandomInt(range.values.length)][3];
+            outcome = range.values[getRandomInt(range.values.length)][4];
+            var output = document.createElement('ul');
+            outputString = `
+                <br> ${person1} was talking to ${person2}. 
+                <br> ${person1} : ${person1Says}
+                <br> ${person2} : ${person2Says}
+                <br> The outcome : ${outcome}
+                `;
+
+            outputString = personNameReplace(outputString, person1, person2, range);
+
+            output.innerHTML = outputString;
+            document.getElementById('content').prepend(output);
+        };
+        document.getElementById('randomize_button').prepend(button);
+
+      }
+    </script>
+    <script async defer src="https://apis.google.com/js/api.js" onload="gapiLoaded()"></script>
+    <script async defer src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>
+  </body>
+</html>
