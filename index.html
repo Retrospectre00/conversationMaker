@@ -1,20 +1,42 @@
 <!DOCTYPE html>
-<html>
+<html id="page" data-bs-theme="light">
   <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
     <title>Conversation Maker! :D</title>
     <meta charset="utf-8" />
   </head>
-  <body>
-    <button id="authorize_button" onclick="handleAuthClick()">Authorize</button>
-    <button id="signout_button" onclick="handleSignoutClick()">Sign Out</button>
-    <p>Conversation Maker! :D</p>
-
+  <body class="p-3">
+    <div class="row">
+        <h2 class="col">Conversation Maker! :D</h2>
+        <button id="authorize_button" class="btn btn-secondary col-lg-1 col-md-2 col-sm-3 col-xs-4" onclick="handleAuthClick()">Authorize</button>
+        <button id="dark_mode" class="btn btn-dark col-lg-1 col-md-2 col-sm-3 col-xs-4" onclick="changeMode(true)"><i class="fas fa-moon"></i></button>
+        <button id="light_mode" class="btn btn-light col-lg-1 col-md-2 col-sm-3 col-xs-4" onclick="changeMode(false)"><i class="fas fa-sun"></i></button>
+    </div>
     <div id="randomize_button"></div>
     <!--Add buttons to initiate auth sequence and sign out-->
 
-    <li id="content" style="white-space: pre-wrap;"></li>
+    <div id="content"></div>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
     <script type="text/javascript">
+        function setMode() {
+            if (document.cookie.indexOf("darkMode=true") !== -1) {
+                document.getElementById('page').setAttribute("data-bs-theme", "dark");
+                document.getElementById('dark_mode').classList.add("d-none");
+                document.getElementById('light_mode').classList.remove("d-none");
+            } else {
+                document.getElementById('page').setAttribute("data-bs-theme", "light");
+                document.getElementById('dark_mode').classList.remove("d-none");
+                document.getElementById('light_mode').classList.add("d-none");
+            }
+        }
+        function changeMode(setting) {
+            document.cookie = `darkMode=${setting}; expires=Thu, 18 Dec 2035 12:00:00 UTC`; 
+            setMode()
+        }
+        setMode()
+
       /* exported gapiLoaded */
       /* exported gisLoaded */
       /* exported handleAuthClick */
@@ -36,7 +58,6 @@
       let gisInited = false;
 
       document.getElementById('authorize_button').style.visibility = 'hidden';
-      document.getElementById('signout_button').style.visibility = 'hidden';
 
       /**
        * Callback after api.js is loaded.
@@ -88,7 +109,6 @@
           if (resp.error !== undefined) {
             throw (resp);
           }
-          document.getElementById('signout_button').style.visibility = 'visible';
           document.getElementById('authorize_button').innerText = 'Refresh';
           await listMajors();
         };
@@ -113,7 +133,6 @@
           gapi.client.setToken('');
           document.getElementById('content').innerText = '';
           document.getElementById('authorize_button').innerText = 'Authorize';
-          document.getElementById('signout_button').style.visibility = 'hidden';
         }
       }
 
@@ -124,26 +143,26 @@
     function personNameReplace(str, person1, person2, range) {
         
         str = str.replace(/PERSON 1 AND 2/gi, person1+" and "+person2);
+        str = str.replace(/PERSON 1 & 2/gi, person1+" and "+person2);
 
-        if (str.toUpperCase().indexOf("PICK ANOTHER PERSON 1") !== -1) {
-            newPerson1 = range.values[getRandomInt(range.values.length)][0];
-            str = str.replace(/\[PICK ANOTHER PERSON 1\]/gi, newPerson1);
-            str = str.replace(/PICK ANOTHER PERSON 1/gi, newPerson1);
-        }
+        newPerson1 = range.values[getRandomInt(range.values.length)][0];
+        str = str.replace(/PICK A PERSON 1/gi, newPerson1);
+        str = str.replace(/PICK ANOTHER PERSON 1/gi, newPerson1);
 
-        if (str.toUpperCase().indexOf("PICK ANOTHER PERSON 2") !== -1) {
-            newPerson2 = range.values[getRandomInt(range.values.length)][0];
-            str = str.replace(/\[PICK ANOTHER PERSON 2\]/gi, newPerson2);
-            str = str.replace(/PICK ANOTHER PERSON 2/gi, newPerson2);
-        }
+        newPerson2 = range.values[getRandomInt(range.values.length)][0];
+        str = str.replace(/PICK A PERSON 2/gi, newPerson2);
+        str = str.replace(/PICK ANOTHER PERSON 2/gi, newPerson2);
+        str = str.replace(/PICK ANOTHER PERSON/gi, newPerson1);
+        str = str.replace(/PICK A PERSON/gi, newPerson2);
+        str = str.replace(/PICK ANY OTHER PERSON/gi, newPerson1);
 
         if (person1.toUpperCase().indexOf("PERSON 1") === -1) {
-            str = str.replace(/\[person 1\]/gi, person1);
+            str = str.replace(/person1/gi, person1);
             str = str.replace(/person 1/gi, person1);
         }
 
         if (person2.toUpperCase().indexOf("PERSON 2") === -1) {
-            str = str.replace(/\[person 2\]/gi, person2);
+            str = str.replace(/person2/gi, person2);
             str = str.replace(/person 2/gi, person2);
         }
 
@@ -173,6 +192,9 @@
 
         var button = document.createElement('button');
         button.innerHTML = 'randomize';
+        button.classList.add('btn-info');
+        button.classList.add('btn');
+        // type="button" class="btn btn-warning"
         button.onclick = function(){
             console.log(range.values);
             row = getRandomInt(range.values.length);
@@ -202,6 +224,7 @@
 
       }
     </script>
+    <script src="https://kit.fontawesome.com/941817f2dc.js" crossorigin="anonymous"></script>
     <script async defer src="https://apis.google.com/js/api.js" onload="gapiLoaded()"></script>
     <script async defer src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>
   </body>
