@@ -8,12 +8,12 @@
   </head>
   <body class="p-3">
     <div class="row">
-        <h2 class="col">Conversation Maker! :D</h2>
-        <button id="authorize_button" class="btn btn-secondary col-lg-1 col-md-2 col-sm-3 col-xs-4" onclick="handleAuthClick()">Authorize</button>
-        <button id="dark_mode" class="btn btn-dark col-lg-1 col-md-2 col-sm-3 col-xs-4" onclick="changeMode(true)"><i class="fas fa-moon"></i></button>
-        <button id="light_mode" class="btn btn-light col-lg-1 col-md-2 col-sm-3 col-xs-4" onclick="changeMode(false)"><i class="fas fa-sun"></i></button>
+        <h2 class="col pt-2">Conversation Maker! :D</h2>
+        <button id="dark_mode" class="btn btn-dark col-lg-1 col-md-2 col-sm-3 col-xs-4 m-1" style="width: auto;" onclick="changeMode(true)"><i style="font-size: 30px;" class="fas fa-moon"></i></button>
+        <button id="light_mode" class="btn btn-light col-lg-1 col-md-2 col-sm-3 col-xs-4 m-1" style="width: auto;" onclick="changeMode(false)"><i style="font-size: 30px;" class="fas fa-sun"></i></button>
+        <button id="authorize_button" class="btn btn-secondary col-lg-1 col-md-2 col-sm-3 col-xs-4" style="width: auto;" onclick="handleAuthClick()">Authorize</button>
     </div>
-    <div id="randomize_button"></div>
+    <div id="randomize_buttons" class="row"></div>
     <!--Add buttons to initiate auth sequence and sign out-->
 
     <div id="content"></div>
@@ -190,8 +190,25 @@
           return;
         }
 
+        var personButton = document.createElement('button');
+        personButton.innerHTML = 'generate a person';
+        personButton.classList.add('btn-info');
+        personButton.classList.add('btn');
+        personButton.onclick = function(){
+            person = range.values[getRandomInt(range.values.length)][getRandomInt(2)];
+            personButton.innerHTML = person;
+        }
+        var outcomeButton = document.createElement('button');
+        outcomeButton.innerHTML = 'generate an outcome';
+        outcomeButton.classList.add('btn-info');
+        outcomeButton.classList.add('btn');
+        outcomeButton.onclick = function(){
+            outcome = range.values[getRandomInt(range.values.length)][4];
+            outcomeButton.innerHTML = outcome;
+        }
+
         var button = document.createElement('button');
-        button.innerHTML = 'randomize';
+        button.innerHTML = 'randomize scenario';
         button.classList.add('btn-info');
         button.classList.add('btn');
         // type="button" class="btn btn-warning"
@@ -207,20 +224,33 @@
             person1Says = range.values[getRandomInt(range.values.length)][2];
             person2Says = range.values[getRandomInt(range.values.length)][3];
             outcome = range.values[getRandomInt(range.values.length)][4];
-            var output = document.createElement('ul');
+            var output = document.createElement('table');
             outputString = `
-                <br> ${person1} was talking to ${person2}. 
-                <br> ${person1} : ${person1Says}
-                <br> ${person2} : ${person2Says}
-                <br> The outcome : ${outcome}
+                <br>
+                <tr><th colspan="2">${person1} was talking to ${person2}.</th></tr>
+                <tr><td>${person1}:</td> <td>${person1Says}</td></tr>
+                <tr><td>${person2}:</td> <td>${person2Says}</td></tr>
+                <tr><td>The outcome:</td> <td>${outcome}</td></tr>
                 `;
 
             outputString = personNameReplace(outputString, person1, person2, range);
 
             output.innerHTML = outputString;
+            output.classList.add('p-5');
+            output.classList.add('table');
+
             document.getElementById('content').prepend(output);
         };
-        document.getElementById('randomize_button').prepend(button);
+        buttonDiv = document.getElementById('randomize_buttons');
+        outcomeButton.classList.add("col")
+        personButton.classList.add("col")
+        button.classList.add("col")
+        outcomeButton.classList.add("m-1")
+        personButton.classList.add("m-1")
+        button.classList.add("m-1")
+        // buttonDiv.prepend(outcomeButton);
+        buttonDiv.prepend(personButton);
+        buttonDiv.prepend(button);
 
       }
     </script>
