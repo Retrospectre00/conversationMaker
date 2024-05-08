@@ -3,20 +3,36 @@
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
-    <title>Conversation Maker! :D</title>
+    <title>Things! :D</title>
     <meta charset="utf-8" />
   </head>
   <body class="p-3">
     <div class="row">
-        <h2 class="col pt-2">Conversation Maker! :D</h2>
+        <h2 class="col pt-2">Things! :D</h2>
         <button id="dark_mode" class="btn btn-dark col-lg-1 col-md-2 col-sm-3 col-xs-4 m-1" style="width: auto;" onclick="changeMode(true)"><i style="font-size: 30px;" class="fas fa-moon"></i></button>
         <button id="light_mode" class="btn btn-light col-lg-1 col-md-2 col-sm-3 col-xs-4 m-1" style="width: auto;" onclick="changeMode(false)"><i style="font-size: 30px;" class="fas fa-sun"></i></button>
         <button id="authorize_button" class="btn btn-secondary col-lg-1 col-md-2 col-sm-3 col-xs-4" style="width: auto;" onclick="handleAuthClick()">Authorize</button>
     </div>
-    <div id="randomize_buttons" class="row"></div>
-    <!--Add buttons to initiate auth sequence and sign out-->
+    <ul class="nav nav-tabs" id="myTab" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="convoMaker-tab" data-bs-toggle="tab" data-bs-target="#convoMaker" type="button" role="tab" aria-controls="convoMaker" aria-selected="true">convo maker</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="cards-tab" data-bs-toggle="tab" data-bs-target="#cards" type="button" role="tab" aria-controls="cards" aria-selected="false">cards</button>
+      </li>
+    </ul>
+    <div class="tab-content" id="myTabContent">
 
-    <div id="content"></div>
+      <div class="tab-pane fade show active" id="convoMaker" role="tabpanel" aria-labelledby="convoMaker-tab">
+        <div id="randomizeConvoButtons" class="row"></div>
+        <div id="convoContent"></div>
+      </div>
+
+      <div class="tab-pane fade" id="cards" role="tabpanel" aria-labelledby="cards-tab">
+        <div id="randomizeCardsButtons" class="row"></div>
+        <div id="cardsContent" class="container"></div>
+      </div>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
     <script type="text/javascript">
@@ -110,7 +126,8 @@
             throw (resp);
           }
           document.getElementById('authorize_button').innerText = 'Refresh';
-          await listMajors();
+          await loadConvoMaker();
+          await loadCards();
         };
 
         if (gapi.client.getToken() === null) {
@@ -131,7 +148,7 @@
         if (token !== null) {
           google.accounts.oauth2.revoke(token.access_token);
           gapi.client.setToken('');
-          document.getElementById('content').innerText = '';
+          document.getElementById('convoContent').innerText = '';
           document.getElementById('authorize_button').innerText = 'Authorize';
         }
       }
@@ -170,23 +187,218 @@
     }
 
       /**
+       * cards spreadsheet:
+       * https://docs.google.com/spreadsheets/d/1jYTJAe_ebHiGgbCf3MwbwWka9A306Q8jhPdDMnnAGks/edit
+       */
+      async function loadCards() {
+        let cardsResponse;
+        try {
+
+          cardsResponse = await gapi.client.sheets.spreadsheets.values.get({
+            spreadsheetId: '1jYTJAe_ebHiGgbCf3MwbwWka9A306Q8jhPdDMnnAGks',
+            range: 'Sheet1!A2:G',
+          });
+
+        } catch (err) {
+          document.getElementById('cardsContent').innerText = err.message;
+          return;
+        }
+        const range = cardsResponse.result;
+        if (!range || !range.values || range.values.length == 0) {
+          document.getElementById('cardsContent').innerText = 'No values found.';
+          return;
+        }
+
+        var blackButton = document.createElement('button');
+        blackButton.innerHTML = 'randomize a black card';
+        blackButton.classList.add('btn-info');
+        blackButton.classList.add('btn');
+        blackButton.onclick = function(){
+            blackCard = range.values[getRandomInt(range.values.length)][0];
+            var output = document.createElement('table');
+            outputString = `
+            <div class="row mt-3 mb-3">
+              <div class="col">
+                <div class="card h-100 text-white bg-dark mb-5" style="max-width: 15rem;">
+                  <div class="card-body">
+                    <p class="card-text">${blackCard}</p>
+                  </div>
+                </div>
+              </div>`
+
+            output.innerHTML = outputString;
+
+            document.getElementById('cardsContent').prepend(output);
+        };
+
+        var whiteButton = document.createElement('button');
+        whiteButton.innerHTML = 'randomize white cards';
+        whiteButton.classList.add('btn-info');
+        whiteButton.classList.add('btn');
+        // type="button" class="btn btn-warning"
+        round = 0;
+        whiteButton.onclick = function(){
+            round++;
+            whiteCards = [];
+            while (Object.keys(whiteCards).length < 6) {
+              card = range.values[getRandomInt(range.values.length)][getRandomInt(6)+1];
+              whiteCards[card] = card;
+            }
+            whiteCards = Object.values(whiteCards);
+
+            var output = document.createElement('table');
+            outputString = `
+            <div class="mt-2 row card-group">
+              <h3> Round ${round} </h3>
+              <div class="col-lg-2 col-md-4 col-sm-6 mb-5">
+                Stemily Orr:
+                <div class="card h-100 text-dark bg-light" style="max-width: 18rem;">
+                  <div class="card-body h-100" height=10vh>
+                    <p class="card-text">${whiteCards[0]}</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-lg-2 col-md-4 col-sm-6 mb-5">
+                Bocke Lell:
+                <div class="card h-100 text-dark bg-light" style="max-width: 18rem;">
+                  <div class="card-body h-100" height=10vh>
+                    <p class="card-text">${whiteCards[1]}</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-lg-2 col-md-4 col-sm-6 mb-5">
+                Camp Chrisbell:
+                <div class="card h-100 text-dark bg-light" style="max-width: 18rem;">
+                  <div class="card-body h-100" height=10vh>
+                    <p class="card-text">${whiteCards[2]}</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-lg-2 col-md-4 col-sm-6 mb-5">
+                Cholly Hinnery:
+                <div class="card h-100 text-dark bg-light" style="max-width: 18rem;">
+                  <div class="card-body h-100" height=10vh>
+                    <p class="card-text">${whiteCards[3]}</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-lg-2 col-md-4 col-sm-6 mb-5">
+                Nichol Clareson:
+                <div class="card h-100 text-dark bg-light" style="max-width: 18rem;">
+                  <div class="card-body h-100" height=10vh>
+                    <p class="card-text">${whiteCards[4]}</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-lg-2 col-md-4 col-sm-6 mb-5">
+                Farcelle Mernandes:
+                <div class="card h-100 text-dark bg-light" style="max-width: 18rem;">
+                  <div class="card-body h-100" height=10vh>
+                    <p class="card-text">${whiteCards[5]}</p>
+                  </div>
+                </div>
+              </div>
+            </div>`;
+
+            output.innerHTML = outputString;
+            // output.classList.add('p-5');
+            // output.classList.add('table');
+
+            document.getElementById('cardsContent').prepend(output);
+        };
+        
+        var tallies = document.createElement('div');
+        tallies.innerHTML = `
+              <table>
+                <tr>
+                    <th> 
+                      SO
+                    </th>
+                    <th>
+                      BL
+                    </th>
+                    <th>
+                      CC
+                    </th>
+                    <th>
+                      CH
+                    </th>
+                    <th>
+                      NC
+                    </th>
+                    <th>
+                      FM
+                    </th>
+                </tr>
+                <tr>
+                    <td> 
+                      <input type="number" min="0" max="5" style="width: 40px;" value=0 class="tally" name="Stemily Orr">
+                    </td>
+                    <td>
+                      <input type="number" min="0" max="5" style="width: 40px;" value=0 class="tally" name="Bocke Lell">
+                    </td>
+                    <td>
+                      <input type="number" min="0" max="5" style="width: 40px;" value=0 class="tally" name="Camp Chrisbell">
+                    </td>
+                    <td>
+                      <input type="number" min="0" max="5" style="width: 40px;" value=0 class="tally" name="Cholly Hinnery">
+                    </td>
+                    <td>
+                      <input type="number" min="0" max="5" style="width: 40px;" value=0 class="tally" name="Nichol Clareson">
+                    </td>
+                    <td>
+                      <input type="number" min="0" max="5" style="width: 40px;" value=0 class="tally" name="Farcelle Mernandes">
+                    </td>
+                </tr>
+                </table>
+                `;
+
+        buttonDiv = document.getElementById('randomizeCardsButtons');
+        blackButton.classList.add("col-4")
+        whiteButton.classList.add("col-4")
+        tallies.classList.add("col-3")
+        blackButton.classList.add("m-1")
+        whiteButton.classList.add("m-1")
+        tallies.classList.add("m-1")
+        buttonDiv.append(blackButton);
+        buttonDiv.append(whiteButton);
+        buttonDiv.append(tallies);
+        
+        tallies = document.getElementsByClassName("tally");
+
+        Array.prototype.forEach.call(tallies, (tally) => {
+          tally.addEventListener("change", (ev) => {
+              if (tally.value >= 5) {
+                confetti();
+                tally.value = 0;
+              }
+            });
+          });
+      }
+
+      /**
        * conversation maker spreadsheet:
        * https://docs.google.com/spreadsheets/d/1qHGfHQVFGn44adJBvdH02ADpiXIvdFJqNHQsWknqGeo/edit
        */
-      async function listMajors() {
-        let response;
+      async function loadConvoMaker() {
+        let convoResponse;
         try {
-          response = await gapi.client.sheets.spreadsheets.values.get({
+          convoResponse = await gapi.client.sheets.spreadsheets.values.get({
             spreadsheetId: '1qHGfHQVFGn44adJBvdH02ADpiXIvdFJqNHQsWknqGeo',
             range: 'Convos!A2:E',
           });
         } catch (err) {
-          document.getElementById('content').innerText = err.message;
+          document.getElementById('convoContent').innerText = err.message;
           return;
         }
-        const range = response.result;
+        const range = convoResponse.result;
         if (!range || !range.values || range.values.length == 0) {
-          document.getElementById('content').innerText = 'No values found.';
+          document.getElementById('convoContent').innerText = 'No values found.';
           return;
         }
 
@@ -239,9 +451,9 @@
             output.classList.add('p-5');
             output.classList.add('table');
 
-            document.getElementById('content').prepend(output);
+            document.getElementById('convoContent').prepend(output);
         };
-        buttonDiv = document.getElementById('randomize_buttons');
+        buttonDiv = document.getElementById('randomizeConvoButtons');
         outcomeButton.classList.add("col")
         personButton.classList.add("col")
         button.classList.add("col")
@@ -255,6 +467,7 @@
       }
     </script>
     <script src="https://kit.fontawesome.com/941817f2dc.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
     <script async defer src="https://apis.google.com/js/api.js" onload="gapiLoaded()"></script>
     <script async defer src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>
   </body>
