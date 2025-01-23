@@ -23,6 +23,9 @@
       <li class="nav-item" role="presentation">
         <button class="nav-link" id="acknowledgements-tab" data-bs-toggle="tab" data-bs-target="#acknowledgements" type="button" role="tab" aria-controls="acknowledgements" aria-selected="true">acknowledgements</button>
       </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="review-tab" data-bs-toggle="tab" data-bs-target="#review" type="button" role="tab" aria-controls="review" aria-selected="true">review</button>
+      </li>
     </ul>
     <div class="tab-content" id="myTabContent">
 
@@ -39,6 +42,11 @@
       <div class="tab-pane fade" id="acknowledgements" role="tabpanel" aria-labelledby="acknowledgements-tab">
         <div id="randomizeAcknowledgementsButtons" class="row"></div>
         <div id="acknowledgementsContent" class="container"></div>
+      </div>
+
+      <div class="tab-pane fade" id="review" role="tabpanel" aria-labelledby="review-tab">
+        <div id="randomizeReviewButtons" class="row"></div>
+        <div id="reviewContent" class="container"></div>
       </div>
     </div>
 
@@ -137,6 +145,7 @@
           await loadConvoMaker();
           await loadCards();
           await loadAcknowledgements();
+          await loadReview();
         };
 
         if (gapi.client.getToken() === null) {
@@ -535,6 +544,82 @@
         
       }
 
+
+      /**
+       * review spreadsheet:
+       * https://docs.google.com/spreadsheets/d/10_Ddl7o8Q8Jm8rSCNCnkmGzH5UMrinCfqTB2YdnLkHo/edit
+       */
+       async function loadReview() {
+        let reviewResponse;
+        try {
+          reviewResponse = await gapi.client.sheets.spreadsheets.values.get({
+            spreadsheetId: '10_Ddl7o8Q8Jm8rSCNCnkmGzH5UMrinCfqTB2YdnLkHo',
+            range: 'Sheet1!A2:E',
+          });
+        } catch (err) {
+          document.getElementById('reviewContent').innerText = err.message;
+          return;
+        }
+        const range = reviewResponse.result;
+        if (!range || !range.values || range.values.length == 0) {
+          document.getElementById('reviewContent').innerText = 'No values found.';
+          return;
+        }
+
+        var reviewButton = document.createElement('button');
+        reviewButton.innerHTML = 'randomize a review';
+        reviewButton.classList.add('btn-info');
+        reviewButton.classList.add('btn');
+        reviewButton.onclick = function(){
+            author = range.values[getRandomInt(range.values.length)][0];
+            letter = author.charAt(0);
+            colour = '#'+(Math.random() * 0xFFFFFF << 0).toString(16).padStart(6, '0');
+            what = range.values[getRandomInt(range.values.length)][1];
+            description = range.values[getRandomInt(range.values.length)][2];
+            why = range.values[getRandomInt(range.values.length)][3];
+            finalThoughts = range.values[getRandomInt(range.values.length)][4];
+            var output = document.createElement('table');
+            outputString = `
+            <div class="row mt-3 mb-3">
+              <div class="col">
+                <div class="card h-100 text-white bg-dark mb-5">
+                  <div class="card-body">
+                    <div class="row pb-2">
+                      <div class="col-auto">
+                        <div class="text-center" style="font-size:35px; width:50px; height:50px; border-radius:25px; background-color:${colour}; flex:0 0 0%;">${letter}</div>
+                      </div>
+                      <div class="col">${author}</div>
+                    </div>
+                    <p><strong>${what} is ${description}</strong></p>
+                    <div>${why}</div>
+                    <div>${finalThoughts}</div>
+                  </div>
+                </div>
+              </div>
+            </div>`
+
+            output.innerHTML = outputString;
+
+            document.getElementById('reviewContent').prepend(output);
+        };
+
+        var reviewerButton = document.createElement('button');
+        reviewerButton.innerHTML = 'randomize a reviewer';
+        reviewerButton.classList.add('btn-info');
+        reviewerButton.classList.add('btn');
+        reviewerButton.onclick = function(){
+          reviewer = range.values[getRandomInt(range.values.length)][0];
+          reviewerButton.innerHTML = reviewer;
+        };
+
+        buttonDiv = document.getElementById('randomizeReviewButtons');
+        reviewButton.classList.add("col-4")
+        reviewButton.classList.add("m-1")
+        buttonDiv.append(reviewButton);
+        reviewerButton.classList.add("col-4")
+        reviewerButton.classList.add("m-1")
+        buttonDiv.append(reviewerButton);
+      }
 
     </script>
     <script src="https://kit.fontawesome.com/941817f2dc.js" crossorigin="anonymous"></script>
