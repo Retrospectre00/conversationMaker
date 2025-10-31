@@ -26,6 +26,9 @@
       <li class="nav-item" role="presentation">
         <button class="nav-link" id="review-tab" data-bs-toggle="tab" data-bs-target="#review" type="button" role="tab" aria-controls="review" aria-selected="true">review</button>
       </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="dream-tab" data-bs-toggle="tab" data-bs-target="#dream" type="button" role="tab" aria-controls="dream" aria-selected="true">dream</button>
+      </li>
     </ul>
     <div class="tab-content" id="myTabContent">
 
@@ -48,6 +51,12 @@
         <div id="randomizeReviewButtons" class="row"></div>
         <div id="reviewContent" class="container"></div>
       </div>
+
+      <div class="tab-pane fade" id="dream" role="tabpanel" aria-labelledby="dream-tab">
+        <div id="randomizeDreamButtons" class="row"></div>
+        <div id="dreamContent" class="container"></div>
+      </div>
+
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
@@ -146,6 +155,7 @@
           await loadCards();
           await loadAcknowledgements();
           await loadReview();
+          await loadDream();
         };
 
         if (gapi.client.getToken() === null) {
@@ -544,6 +554,62 @@
         
       }
 
+      /**
+       * https://docs.google.com/spreadsheets/d/1oLyyX-3ITQGxbKargNnYLJNwLxN98V85R9aIBlT_log/edit
+       */
+       async function loadDream() {
+        let dreamResponse;
+        try {
+          dreamResponse = await gapi.client.sheets.spreadsheets.values.get({
+            spreadsheetId: '1oLyyX-3ITQGxbKargNnYLJNwLxN98V85R9aIBlT_log',
+            range: 'Sheet1!A2:E',
+          });
+        } catch (err) {
+          document.getElementById('dreamContent').innerText = err.message;
+          return;
+        }
+        const range = dreamResponse.result;
+        if (!range || !range.values || range.values.length == 0) {
+          document.getElementById('dreamContent').innerText = 'No values found.';
+          return;
+        }
+
+        var dreamButton = document.createElement('button');
+        dreamButton.innerHTML = 'randomize a dream';
+        dreamButton.classList.add('btn-info');
+        dreamButton.classList.add('btn');
+        dreamButton.onclick = function(){
+            character1 = range.values[getRandomInt(range.values.length)][0];
+            action = range.values[getRandomInt(range.values.length)][1];
+            character2 = range.values[getRandomInt(range.values.length)][2];
+            place = range.values[getRandomInt(range.values.length)][3];
+            ending = range.values[getRandomInt(range.values.length)][4];
+            var output = document.createElement('table');
+            outputString = `
+            <div class="row mt-3 mb-3">
+              <div class="col">
+                <div class="card h-100 text-white bg-dark mb-5">
+                  <div class="card-body">
+                    <div>${character1}</div>
+                    <div>${action}</div>
+                    <div>${character2}</div>
+                    <div>${place}</div>
+                    <div>${ending}</div>
+                  </div>
+                </div>
+              </div>
+            </div>`
+
+            output.innerHTML = outputString;
+
+            document.getElementById('dreamContent').prepend(output);
+        };
+
+        buttonDiv = document.getElementById('randomizeDreamButtons');
+        dreamButton.classList.add("col-4")
+        dreamButton.classList.add("m-1")
+        buttonDiv.append(dreamButton);
+      }
 
       /**
        * review spreadsheet:
