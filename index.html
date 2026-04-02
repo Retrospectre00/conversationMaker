@@ -32,6 +32,12 @@
        <li class="nav-item" role="presentation">
          <button class="nav-link" id="gflcrimes-tab" data-bs-toggle="tab" data-bs-target="#gflcrimes" type="button" role="tab" aria-controls="gflcrimes" aria-selected="false">GFL crimes</button>
        </li>
+       <li class="nav-item" role="presentation">
+          <button class="nav-link" id="beverageblender-tab" data-bs-toggle="tab" data-bs-target="#beverageblender" type="button" role="tab" aria-controls="beverageblender" aria-selected="false">beverage blender</button>
+        </li>
+       <li class="nav-item" role="presentation">
+         <button class="nav-link" id="insultgenerator-tab" data-bs-toggle="tab" data-bs-target="#insultgenerator" type="button" role="tab" aria-controls="insultgenerator" aria-selected="false">insult generator</button>
+       </li>
      </ul>
      <div class="tab-content" id="myTabContent">
 
@@ -63,6 +69,14 @@
        <div class="tab-pane fade" id="gflcrimes" role="tabpanel" aria-labelledby="gflcrimes-tab">
          <div id="randomizeGFLCrimesButtons" class="row"></div>
          <div id="gflcrimesContent" class="container"></div>
+       </div>
+       <div class="tab-pane fade" id="beverageblender" role="tabpanel" aria-labelledby="beverageblender-tab">
+         <div id="randomizeBeverageBlenderButtons" class="row"></div>
+         <div id="beverageblenderContent" class="container"></div>
+       </div>
+       <div class="tab-pane fade" id="insultgenerator" role="tabpanel" aria-labelledby="insultgenerator-tab">
+         <div id="randomizeInsultGeneratorButtons" class="row"></div>
+         <div id="insultgeneratorContent" class="container"></div>
        </div>
 
      </div>
@@ -165,6 +179,8 @@
           await loadReview();
           await loadDream();
           await loadGFLCrimes();
+          await loadBeverageBlender();
+          await loadInsultGenerator();
         };
 
         if (gapi.client.getToken() === null) {
@@ -747,6 +763,108 @@
         gflButton.classList.add('col-4');
         gflButton.classList.add('m-1');
         buttonDiv.append(gflButton);
+      }
+
+      /**
+       * beverage blender spreadsheet:
+       * https://docs.google.com/spreadsheets/d/1nvGaMMwTZHzTte78ruNowLNotF-l55y5fkFda_J76Q4/edit
+       */
+      async function loadBeverageBlender() {
+        let beverageBlenderResponse;
+        try {
+          beverageBlenderResponse = await gapi.client.sheets.spreadsheets.values.get({
+            spreadsheetId: '1nvGaMMwTZHzTte78ruNowLNotF-l55y5fkFda_J76Q4',
+            range: 'Sheet1!A2:E',
+          });
+        } catch (err) {
+          document.getElementById('beverageblenderContent').innerText = err.message;
+          return;
+        }
+        const range = beverageBlenderResponse.result;
+        if (!range || !range.values || range.values.length === 0) {
+          document.getElementById('beverageblenderContent').innerText = 'No values found.';
+          return;
+        }
+
+        var beverageBlenderButton = document.createElement('button');
+        beverageBlenderButton.innerHTML = 'randomize a beverage blend';
+        beverageBlenderButton.classList.add('btn-info');
+        beverageBlenderButton.classList.add('btn');
+        beverageBlenderButton.onclick = function(){
+          let placer = range.values[getRandomInt(range.values.length)][0] || '';
+          let barista = range.values[getRandomInt(range.values.length)][1] || '';
+          let drink = range.values[getRandomInt(range.values.length)][2] || '';
+          let cup = range.values[getRandomInt(range.values.length)][3] || '';
+          let next = range.values[getRandomInt(range.values.length)][4] || '';
+          let output = document.createElement('table');
+          let blendSentence = `${placer} ordered ${drink} in ${cup} from ${barista}`.replace(/\s+/g, ' ').trim();
+          let outputString = `
+            <div class="mt-3 mb-3">
+              <div class="card h-100 text-white bg-dark mb-5">
+                <div class="card-body">
+                  <div>${blendSentence}</div>
+                  <div><em>${next}</em></div>
+                </div>
+              </div>
+            </div>`;
+          output.innerHTML = outputString;
+          document.getElementById('beverageblenderContent').prepend(output);
+        };
+        var buttonDiv = document.getElementById('randomizeBeverageBlenderButtons');
+        beverageBlenderButton.classList.add('col-4');
+        beverageBlenderButton.classList.add('m-1');
+        buttonDiv.append(beverageBlenderButton);
+      }
+
+      /**
+       * insult generator spreadsheet:
+       * https://docs.google.com/spreadsheets/d/16HPAAUWhRYnFUCHqB5fAw4YyUKDBy5802t-ask9SNdw/edit
+       */
+       async function loadInsultGenerator() {
+        let insultGeneratorResponse;
+        try {
+          insultGeneratorResponse = await gapi.client.sheets.spreadsheets.values.get({
+            spreadsheetId: '16HPAAUWhRYnFUCHqB5fAw4YyUKDBy5802t-ask9SNdw',
+            range: 'Sheet1!A2:E',
+          });
+        } catch (err) {
+          document.getElementById('insultgeneratorContent').innerText = err.message;
+          return;
+        }
+        const range = insultGeneratorResponse.result;
+        if (!range || !range.values || range.values.length === 0) {
+          document.getElementById('insultgeneratorContent').innerText = 'No values found.';
+          return;
+        }
+
+        var insultGeneratorButton = document.createElement('button');
+        insultGeneratorButton.innerHTML = 'randomize an insult';
+        insultGeneratorButton.classList.add('btn-info');
+        insultGeneratorButton.classList.add('btn');
+        insultGeneratorButton.onclick = function(){
+          let insulter = range.values[getRandomInt(range.values.length)][0] || '';
+          let target = range.values[getRandomInt(range.values.length)][1] || '';
+          let object = range.values[getRandomInt(range.values.length)][2] || '';
+          let suffix = range.values[getRandomInt(range.values.length)][3] || '';
+          let reaction = range.values[getRandomInt(range.values.length)][4] || '';
+          let output = document.createElement('table');
+          let insultSentence = `${insulter}: ${object} ${suffix}, ${target}`.replace(/\s+/g, ' ').trim();
+          let outputString = `
+            <div class="mt-3 mb-3">
+              <div class="card h-100 text-white bg-dark mb-5">
+                <div class="card-body">
+                  <div>${insultSentence}</div>
+                  <div><em>${reaction}</em></div>
+                </div>
+              </div>
+            </div>`;
+          output.innerHTML = outputString;
+          document.getElementById('insultgeneratorContent').prepend(output);
+        };
+        var buttonDiv = document.getElementById('randomizeInsultGeneratorButtons');
+        insultGeneratorButton.classList.add('col-4');
+        insultGeneratorButton.classList.add('m-1');
+        buttonDiv.append(insultGeneratorButton);
       }
 
     </script>
