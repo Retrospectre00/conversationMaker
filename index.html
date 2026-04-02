@@ -13,51 +13,59 @@
         <button id="light_mode" class="btn btn-light col-lg-1 col-md-2 col-sm-3 col-xs-4 m-1" style="width: auto;" onclick="changeMode(false)"><i style="font-size: 30px;" class="fas fa-sun"></i></button>
         <button id="authorize_button" class="btn btn-secondary col-lg-1 col-md-2 col-sm-3 col-xs-4" style="width: auto;" onclick="handleAuthClick()">Authorize</button>
     </div>
-    <ul class="nav nav-tabs" id="myTab" role="tablist">
-      <li class="nav-item" role="presentation">
-        <button class="nav-link active" id="convoMaker-tab" data-bs-toggle="tab" data-bs-target="#convoMaker" type="button" role="tab" aria-controls="convoMaker" aria-selected="true">convo maker</button>
-      </li>
-      <li class="nav-item" role="presentation">
-        <button class="nav-link" id="cards-tab" data-bs-toggle="tab" data-bs-target="#cards" type="button" role="tab" aria-controls="cards" aria-selected="false">cards</button>
-      </li>
-      <li class="nav-item" role="presentation">
-        <button class="nav-link" id="acknowledgements-tab" data-bs-toggle="tab" data-bs-target="#acknowledgements" type="button" role="tab" aria-controls="acknowledgements" aria-selected="true">acknowledgements</button>
-      </li>
-      <li class="nav-item" role="presentation">
-        <button class="nav-link" id="review-tab" data-bs-toggle="tab" data-bs-target="#review" type="button" role="tab" aria-controls="review" aria-selected="true">review</button>
-      </li>
-      <li class="nav-item" role="presentation">
-        <button class="nav-link" id="dream-tab" data-bs-toggle="tab" data-bs-target="#dream" type="button" role="tab" aria-controls="dream" aria-selected="true">dream</button>
-      </li>
-    </ul>
-    <div class="tab-content" id="myTabContent">
+     <ul class="nav nav-tabs" id="myTab" role="tablist">
+       <li class="nav-item" role="presentation">
+         <button class="nav-link active" id="convoMaker-tab" data-bs-toggle="tab" data-bs-target="#convoMaker" type="button" role="tab" aria-controls="convoMaker" aria-selected="true">convo maker</button>
+       </li>
+       <li class="nav-item" role="presentation">
+         <button class="nav-link" id="cards-tab" data-bs-toggle="tab" data-bs-target="#cards" type="button" role="tab" aria-controls="cards" aria-selected="false">cards</button>
+       </li>
+       <li class="nav-item" role="presentation">
+         <button class="nav-link" id="acknowledgements-tab" data-bs-toggle="tab" data-bs-target="#acknowledgements" type="button" role="tab" aria-controls="acknowledgements" aria-selected="true">acknowledgements</button>
+       </li>
+       <li class="nav-item" role="presentation">
+         <button class="nav-link" id="review-tab" data-bs-toggle="tab" data-bs-target="#review" type="button" role="tab" aria-controls="review" aria-selected="true">review</button>
+       </li>
+       <li class="nav-item" role="presentation">
+         <button class="nav-link" id="dream-tab" data-bs-toggle="tab" data-bs-target="#dream" type="button" role="tab" aria-controls="dream" aria-selected="true">dream</button>
+       </li>
+       <li class="nav-item" role="presentation">
+         <button class="nav-link" id="gflcrimes-tab" data-bs-toggle="tab" data-bs-target="#gflcrimes" type="button" role="tab" aria-controls="gflcrimes" aria-selected="false">GFL crimes</button>
+       </li>
+     </ul>
+     <div class="tab-content" id="myTabContent">
 
-      <div class="tab-pane fade show active" id="convoMaker" role="tabpanel" aria-labelledby="convoMaker-tab">
-        <div id="randomizeConvoButtons" class="row"></div>
-        <div id="convoContent"></div>
-      </div>
+       <div class="tab-pane fade show active" id="convoMaker" role="tabpanel" aria-labelledby="convoMaker-tab">
+         <div id="randomizeConvoButtons" class="row"></div>
+         <div id="convoContent"></div>
+       </div>
 
-      <div class="tab-pane fade" id="cards" role="tabpanel" aria-labelledby="cards-tab">
-        <div id="randomizeCardsButtons" class="row"></div>
-        <div id="cardsContent" class="container"></div>
-      </div>
+       <div class="tab-pane fade" id="cards" role="tabpanel" aria-labelledby="cards-tab">
+         <div id="randomizeCardsButtons" class="row"></div>
+         <div id="cardsContent" class="container"></div>
+       </div>
 
-      <div class="tab-pane fade" id="acknowledgements" role="tabpanel" aria-labelledby="acknowledgements-tab">
-        <div id="randomizeAcknowledgementsButtons" class="row"></div>
-        <div id="acknowledgementsContent" class="container"></div>
-      </div>
+       <div class="tab-pane fade" id="acknowledgements" role="tabpanel" aria-labelledby="acknowledgements-tab">
+         <div id="randomizeAcknowledgementsButtons" class="row"></div>
+         <div id="acknowledgementsContent" class="container"></div>
+       </div>
 
-      <div class="tab-pane fade" id="review" role="tabpanel" aria-labelledby="review-tab">
-        <div id="randomizeReviewButtons" class="row"></div>
-        <div id="reviewContent" class="container"></div>
-      </div>
+       <div class="tab-pane fade" id="review" role="tabpanel" aria-labelledby="review-tab">
+         <div id="randomizeReviewButtons" class="row"></div>
+         <div id="reviewContent" class="container"></div>
+       </div>
 
-      <div class="tab-pane fade" id="dream" role="tabpanel" aria-labelledby="dream-tab">
-        <div id="randomizeDreamButtons" class="row"></div>
-        <div id="dreamContent" class="container"></div>
-      </div>
+       <div class="tab-pane fade" id="dream" role="tabpanel" aria-labelledby="dream-tab">
+         <div id="randomizeDreamButtons" class="row"></div>
+         <div id="dreamContent" class="container"></div>
+       </div>
 
-    </div>
+       <div class="tab-pane fade" id="gflcrimes" role="tabpanel" aria-labelledby="gflcrimes-tab">
+         <div id="randomizeGFLCrimesButtons" class="row"></div>
+         <div id="gflcrimesContent" class="container"></div>
+       </div>
+
+     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
     <script type="text/javascript">
@@ -156,6 +164,7 @@
           await loadAcknowledgements();
           await loadReview();
           await loadDream();
+          await loadGFLCrimes();
         };
 
         if (gapi.client.getToken() === null) {
@@ -685,6 +694,59 @@
         reviewerButton.classList.add("col-4")
         reviewerButton.classList.add("m-1")
         buttonDiv.append(reviewerButton);
+      }
+
+      /**
+       * GFL Crimes spreadsheet:
+       * https://docs.google.com/spreadsheets/d/12f1b5EWqrMefayNZ_xkwfXT9Epw-a5Kf_-YSg4dx4yY/edit
+       */
+      async function loadGFLCrimes() {
+        let gflResponse;
+        try {
+          gflResponse = await gapi.client.sheets.spreadsheets.values.get({
+            spreadsheetId: '12f1b5EWqrMefayNZ_xkwfXT9Epw-a5Kf_-YSg4dx4yY',
+            range: 'Sheet1!A2:E',
+          });
+        } catch (err) {
+          document.getElementById('gflcrimesContent').innerText = err.message;
+          return;
+        }
+        const range = gflResponse.result;
+        if (!range || !range.values || range.values.length == 0) {
+          document.getElementById('gflcrimesContent').innerText = 'No values found.';
+          return;
+        }
+
+        var gflButton = document.createElement('button');
+        gflButton.innerHTML = 'randomize a crime';
+        gflButton.classList.add('btn-info');
+        gflButton.classList.add('btn');
+        gflButton.onclick = function(){
+          let accomplice = range.values[getRandomInt(range.values.length)][0] || '';
+          let victim = range.values[getRandomInt(range.values.length)][1] || '';
+          let motive = range.values[getRandomInt(range.values.length)][2] || '';
+          let crime = range.values[getRandomInt(range.values.length)][3] || '';
+          let aftermath = range.values[getRandomInt(range.values.length)][4] || '';
+          let output = document.createElement('table');
+          let outputString = `
+            <div class="mt-3 mb-3">
+              <div class="card h-100 text-white bg-dark mb-5">
+                <div class="card-body">
+                  <div><strong>accomplice:</strong> ${accomplice}</div>
+                  <div><strong>victim:</strong> ${victim}</div>
+                  <div><strong>motive:</strong> ${motive}</div>
+                  <div><strong>crime:</strong> ${crime}</div>
+                  <div><strong>aftermath:</strong> ${aftermath}</div>
+                </div>
+              </div>
+            </div>`;
+          output.innerHTML = outputString;
+          document.getElementById('gflcrimesContent').prepend(output);
+        };
+        var buttonDiv = document.getElementById('randomizeGFLCrimesButtons');
+        gflButton.classList.add('col-4');
+        gflButton.classList.add('m-1');
+        buttonDiv.append(gflButton);
       }
 
     </script>
